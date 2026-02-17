@@ -9,9 +9,9 @@ Future<void> main() async {
   // 2. เชื่อมต่อ Supabase
   // ⚠️ ไปเอา URL และ Key ได้ที่: Supabase Dashboard -> Project Settings -> API
   await Supabase.initialize(
-    url: 'https://abqsplgqqvrwadygagkn.supabase.co',
+    url: '....',
     anonKey:
-        'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFicXNwbGdxcXZyd2FkeWdhZ2tuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzA2Mzg1MTgsImV4cCI6MjA4NjIxNDUxOH0.1tGXrnUzvraNcYYtgEJoMhFE_-YuZ2TkYmNPgJ3CkXU',
+        '....',
   );
 
   runApp(const MyApp());
@@ -55,3 +55,4 @@ class MyApp extends StatelessWidget {
     );
   }
 }
+
