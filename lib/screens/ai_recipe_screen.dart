@@ -95,7 +95,7 @@ class _AiRecipeScreenState extends State<AiRecipeScreen> {
 
     try {
       // ⚠️ ใส่ API Key ของคุณที่นี่
-      final String apiKey = 'AIzaSyAGPF2XsudHdxHTlXWKTV0GtiFWEJ1Rl68';
+      final String apiKey = 'YOUR_API_KEY';
       final model = GenerativeModel(model: 'gemini-2.5-flash', apiKey: apiKey);
 
       // เตรียมรายชื่อวัตถุดิบเป็น Text
@@ -627,3 +627,4 @@ class _AiRecipeScreenState extends State<AiRecipeScreen> {
     );
   }
 }
+
