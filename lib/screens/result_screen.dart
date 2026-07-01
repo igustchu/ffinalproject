@@ -111,8 +111,23 @@ class _ResultScreenState extends State<ResultScreen> {
   }
 
   // --- ฟังก์ชันบันทึกลง Database ---
+  // --- ฟังก์ชันบันทึกลง Database ---
   Future<void> _saveToSupabase() async {
-    // 1. แสดง Loading
+    final supabase = Supabase.instance.client;
+    final user = supabase.auth.currentUser;
+
+    // ✅ 1. เช็คก่อนว่าล็อกอินหรือยัง
+    if (user == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('กรุณาล็อกอินก่อนบันทึกข้อมูล'),
+          backgroundColor: Colors.red,
+        ),
+      );
+      return; // หยุดการทำงานทันทีถ้ายังไม่ล็อกอิน
+    }
+
+    // แสดง Loading
     showDialog(
       context: context,
       barrierDismissible: false,
@@ -120,35 +135,27 @@ class _ResultScreenState extends State<ResultScreen> {
     );
 
     try {
-      final supabase = Supabase.instance.client;
-      final user = supabase.auth.currentUser;
-
-      if (user == null) {
-        throw Exception('User not authenticated');
-      }
-
       // 2. วนลูปข้อมูลทั้งหมดเพื่อเตรียมบันทึก
       for (var item in widget.foundItems) {
-        // แปลงจำนวนวันหมดอายุ (expiry_days) เป็นวันที่จริง (Date String)
         int days = int.tryParse(item['expiry_days'].toString()) ?? 7;
         DateTime expiryDate = DateTime.now().add(Duration(days: days));
 
-        // ส่งข้อมูลเข้าตาราง ingredients
+        // ✅ 3. ส่ง user_id ไปด้วยเพื่อความชัวร์ (ถึง DB จะทำให้แล้วก็เถอะ)
         await supabase.from('ingredients').insert({
           'user_id': user.id, // ✅ สำคัญมาก
           'name': item['name'],
           'category': item['category'],
           'quantity': item['quantity'],
-          'max_quantity': item['quantity'], // กำหนด max เท่ากับค่าเริ่มต้น
+          'max_quantity': item['quantity'],
           'unit': item['unit'],
-          'expiry_date': expiryDate.toIso8601String(), // ส่งเป็น Text ISO8601
+          'expiry_date': expiryDate.toIso8601String(),
         });
       }
 
-      // 3. ปิด Loading
+      // ปิด Loading
       if (mounted) Navigator.pop(context);
 
-      // 4. ไปหน้า Inventory (แบบล้าง Stack เพื่อไม่ให้กดย้อนกลับมาหน้า Save ได้)
+      // ไปหน้า Inventory
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
@@ -164,7 +171,6 @@ class _ResultScreenState extends State<ResultScreen> {
         );
       }
     } catch (e) {
-      // กรณี Error
       if (mounted) Navigator.pop(context); // ปิด Loading
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(

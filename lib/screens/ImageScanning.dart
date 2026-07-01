@@ -17,7 +17,7 @@ class _HomeScreenState extends State<ImageScanning> {
   final ImagePicker _picker = ImagePicker();
 
   // ⚠️ อย่าลืมใส่ API Key ของคุณ
-  final String _apiKey = 'AIzaSyB0lo3Xmo7E4mZkl4eycAnj5fs_4w6kb6I';
+  final String _apiKey = 'YOUR_API_KEY';
 
   Future<void> _pickAndAnalyzeImage(ImageSource source) async {
     if (!mounted) return;

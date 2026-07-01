@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'ImageScanning.dart'; // Import หน้าสแกน
 import 'inventory_screen.dart'; // Import หน้าคลังวัตถุดิบ
+import 'ai_recipe_screen.dart';
 
 class MainMenuScreen extends StatefulWidget {
   const MainMenuScreen({super.key});
@@ -115,15 +116,19 @@ class _MainMenuScreenState extends State<MainMenuScreen> {
 
               // --- 2. Menu Buttons List ---
 
-              // ปุ่ม AI Recipe Generator (Demo)
+              /// ปุ่ม AI Recipe Generator
               _buildMenuCard(
                 icon: Icons.auto_awesome,
                 iconColor: Colors.pinkAccent,
                 title: "AI Recipe Generator",
                 subtitle: "สร้างเมนูจากวัตถุดิบที่มี",
                 onTap: () {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text("ฟีเจอร์นี้กำลังพัฒนา...")),
+                  // ✅ เปลี่ยนเป็นเปิดหน้าใหม่
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => const AiRecipeScreen(),
+                    ),
                   );
                 },
               ),
