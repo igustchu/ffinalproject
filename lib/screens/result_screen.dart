@@ -121,6 +121,11 @@ class _ResultScreenState extends State<ResultScreen> {
 
     try {
       final supabase = Supabase.instance.client;
+      final user = supabase.auth.currentUser;
+
+      if (user == null) {
+        throw Exception('User not authenticated');
+      }
 
       // 2. วนลูปข้อมูลทั้งหมดเพื่อเตรียมบันทึก
       for (var item in widget.foundItems) {
@@ -130,6 +135,7 @@ class _ResultScreenState extends State<ResultScreen> {
 
         // ส่งข้อมูลเข้าตาราง ingredients
         await supabase.from('ingredients').insert({
+          'user_id': user.id, // ✅ สำคัญมาก
           'name': item['name'],
           'category': item['category'],
           'quantity': item['quantity'],
@@ -237,8 +243,9 @@ class _IngredientCardItemState extends State<IngredientCardItem> {
   String _getEmoji(String cat) {
     if (cat.contains('ผัก')) return '🥬';
     if (cat.contains('ผลไม้')) return '🍎';
-    if (cat.contains('เนื้อ') || cat.contains('ไก่') || cat.contains('หมู'))
+    if (cat.contains('เนื้อ') || cat.contains('ไก่') || cat.contains('หมู')) {
       return '🥩';
+    }
     if (cat.contains('นม') || cat.contains('น้ำ')) return '🥛';
     if (cat.contains('ขนม')) return '🍪';
     return '🍽️';
@@ -348,7 +355,7 @@ class _IngredientCardItemState extends State<IngredientCardItem> {
               // Dropdown หน่วย
               Expanded(
                 child: DropdownButtonFormField<String>(
-                  value:
+                  initialValue:
                       [
                         "ชิ้น",
                         "กรัม",

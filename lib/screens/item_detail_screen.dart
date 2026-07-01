@@ -332,7 +332,7 @@ class _ItemDetailScreenState extends State<ItemDetailScreen> {
                                     label: "หน่วย",
                                     icon: Icons.scale_rounded,
                                     child: DropdownButtonFormField<String>(
-                                      value: _unit,
+                                      initialValue: _unit,
                                       isExpanded: true,
                                       decoration: _inputDecoration(""),
                                       items: _unitList
@@ -413,7 +413,7 @@ class _ItemDetailScreenState extends State<ItemDetailScreen> {
                                   borderRadius: BorderRadius.circular(15),
                                 ),
                               ).copyWith(
-                                backgroundColor: MaterialStateProperty.all(
+                                backgroundColor: WidgetStateProperty.all(
                                   Colors.transparent,
                                 ),
                               ),
