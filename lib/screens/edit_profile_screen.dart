@@ -1,503 +1,200 @@
 import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
-
 class EditProfileScreen extends StatefulWidget {
-
   const EditProfileScreen({super.key});
 
-
   @override
-  State<EditProfileScreen> createState() =>
-      _EditProfileScreenState();
-
+  State<EditProfileScreen> createState() => _EditProfileScreenState();
 }
 
+class _EditProfileScreenState extends State<EditProfileScreen> {
+  final supabase = Supabase.instance.client;
 
+  final firstNameController = TextEditingController();
 
-class _EditProfileScreenState
-    extends State<EditProfileScreen> {
+  final lastNameController = TextEditingController();
 
-
-  final supabase =
-  Supabase.instance.client;
-
-
-  final firstNameController =
-  TextEditingController();
-
-
-  final lastNameController =
-  TextEditingController();
-
-
-  final phoneController =
-  TextEditingController();
-
-
+  final phoneController = TextEditingController();
 
   bool loading = false;
 
-
-
-
   @override
   void initState() {
-
     super.initState();
 
     loadData();
-
   }
 
+  void loadData() {
+    final user = supabase.auth.currentUser;
 
+    firstNameController.text = user?.userMetadata?['first_name'] ?? "";
 
+    lastNameController.text = user?.userMetadata?['last_name'] ?? "";
 
-
-  void loadData(){
-
-
-    final user =
-    supabase.auth.currentUser;
-
-
-    firstNameController.text =
-        user?.userMetadata?['first_name']
-            ?? "";
-
-
-    lastNameController.text =
-        user?.userMetadata?['last_name']
-            ?? "";
-
-
-    phoneController.text =
-        user?.userMetadata?['phone']
-            ?? "";
-
-
+    phoneController.text = user?.userMetadata?['phone'] ?? "";
   }
-
-
-
-
-
 
   Future<void> saveProfile() async {
-
-
     setState(() {
-
       loading = true;
-
     });
 
-
-
-    try{
-
-
+    try {
       await supabase.auth.updateUser(
+        UserAttributes(
+          data: {
+            "first_name": firstNameController.text.trim(),
 
-  UserAttributes(
+            "last_name": lastNameController.text.trim(),
 
-    data:{
+            "phone": phoneController.text.trim(),
+          },
+        ),
+      );
 
-      "first_name":
-      firstNameController.text.trim(),
+      await supabase.auth.refreshSession();
 
-
-      "last_name":
-      lastNameController.text.trim(),
-
-
-      "phone":
-      phoneController.text.trim(),
-
-    },
-
-  ),
-
-);
-
-
-await supabase.auth.refreshSession();
-
-
-await supabase.auth.getUser();
-
-// เพิ่มบรรทัดนี้
-await supabase.auth.refreshSession();
- if(mounted){
-
-  final user =
       await supabase.auth.getUser();
 
+      // เพิ่มบรรทัดนี้
+      await supabase.auth.refreshSession();
+      if (mounted) {
+        final user = await supabase.auth.getUser();
 
-  Navigator.pop(
-
-    context,
-
-    user.user,
-
-  );
-
-}
-
-
-
-
-    }catch(e){
-
-
-      if(mounted){
-
-
-        ScaffoldMessenger.of(context)
-            .showSnackBar(
-
-          SnackBar(
-
-            content:
-            Text(
-              e.toString(),
-            ),
-
-          ),
-
-        );
-
-
+        Navigator.pop(context, user.user);
       }
-
-
-    }
-
-
-
-    finally{
-
-
-      if(mounted){
-
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text(e.toString())));
+      }
+    } finally {
+      if (mounted) {
         setState(() {
-
-          loading=false;
-
+          loading = false;
         });
-
       }
-
-
     }
-
-
   }
-
-
-
-
-
-
 
   @override
   Widget build(BuildContext context) {
-
-
     return Scaffold(
-
-      backgroundColor:
-      const Color(0xffD8EEFF),
-
+      backgroundColor: const Color(0xffD8EEFF),
 
       body: SafeArea(
-
         child: Padding(
-
-          padding:
-          const EdgeInsets.all(20),
-
+          padding: const EdgeInsets.all(20),
 
           child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
 
-            crossAxisAlignment:
-            CrossAxisAlignment.start,
-
-
-            children:[
-
-
-
+            children: [
               // Back
-
               IconButton(
+                icon: const Icon(Icons.arrow_back, size: 30),
 
-                icon:
-                const Icon(
-                  Icons.arrow_back,
-                  size:30,
-                ),
-
-
-                onPressed:(){
-
+                onPressed: () {
                   Navigator.pop(context);
-
                 },
-
               ),
 
-
-
-
-              const SizedBox(height:20),
-
-
-
-
+              const SizedBox(height: 20),
 
               const Center(
-
-
                 child: Text(
-
                   "แก้ไขข้อมูลส่วนตัว",
 
-
-                  style:
-                  TextStyle(
-
-                    fontSize:26,
-
-                    fontWeight:
-                    FontWeight.bold,
-
-                  ),
-
+                  style: TextStyle(fontSize: 26, fontWeight: FontWeight.bold),
                 ),
-
               ),
 
-
-
-
-
-              const SizedBox(height:35),
-
-
-
+              const SizedBox(height: 35),
 
               buildField(
-
                 "First Name",
 
                 firstNameController,
 
                 Icons.person_outline,
-
               ),
 
+              const SizedBox(height: 18),
 
+              buildField("Last Name", lastNameController, Icons.person_outline),
 
+              const SizedBox(height: 18),
 
-              const SizedBox(height:18),
-
-
-
-
-              buildField(
-
-                "Last Name",
-
-                lastNameController,
-
-                Icons.person_outline,
-
-              ),
-
-
-
-
-              const SizedBox(height:18),
-
-
-
-
-              buildField(
-
-                "Phone",
-
-                phoneController,
-
-                Icons.phone_outlined,
-
-              ),
-
-
-
-
+              buildField("Phone", phoneController, Icons.phone_outlined),
 
               const Spacer(),
 
-
-
-
-
               SizedBox(
+                width: double.infinity,
 
-                width:
-                double.infinity,
+                height: 55,
 
+                child: ElevatedButton(
+                  onPressed: loading ? null : saveProfile,
 
-                height:55,
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: const Color(0xff5189C9),
 
-
-                child:
-                ElevatedButton(
-
-                  onPressed:
-                  loading
-                      ? null
-                      : saveProfile,
-
-
-                  style:
-                  ElevatedButton.styleFrom(
-
-                    backgroundColor:
-                    const Color(0xff5189C9),
-
-
-                    shape:
-                    RoundedRectangleBorder(
-
-                      borderRadius:
-                      BorderRadius.circular(20),
-
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(20),
                     ),
-
                   ),
 
+                  child: loading
+                      ? const CircularProgressIndicator(color: Colors.white)
+                      : const Text(
+                          "บันทึก",
 
+                          style: TextStyle(
+                            fontSize: 18,
 
-                  child:
+                            color: Colors.white,
 
-                  loading
-
-                      ?
-
-                  const CircularProgressIndicator(
-                    color:Colors.white,
-                  )
-
-
-                      :
-
-                  const Text(
-
-                    "บันทึก",
-
-                    style:
-                    TextStyle(
-
-                      fontSize:18,
-
-                      color:Colors.white,
-
-                      fontWeight:
-                      FontWeight.bold,
-
-                    ),
-
-                  ),
-
-
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
                 ),
-
               ),
-
-
-
             ],
-
           ),
-
         ),
-
       ),
-
     );
-
   }
-
-
-
-
-
-
-
 
   Widget buildField(
+    String label,
 
-      String label,
+    TextEditingController controller,
 
-      TextEditingController controller,
-
-      IconData icon,
-
-      ){
-
-
+    IconData icon,
+  ) {
     return TextField(
+      controller: controller,
 
-      controller:
-      controller,
+      decoration: InputDecoration(
+        labelText: label,
 
+        prefixIcon: Icon(icon),
 
-      decoration:
-      InputDecoration(
+        filled: true,
 
+        fillColor: Colors.white,
 
-        labelText:
-        label,
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(20),
 
-
-        prefixIcon:
-        Icon(icon),
-
-
-
-        filled:true,
-
-
-        fillColor:
-        Colors.white,
-
-
-
-        border:
-        OutlineInputBorder(
-
-
-          borderRadius:
-          BorderRadius.circular(20),
-
-
-          borderSide:
-          BorderSide.none,
-
-
+          borderSide: BorderSide.none,
         ),
-
-
       ),
-
-
     );
-
-
   }
-
-
-
 }

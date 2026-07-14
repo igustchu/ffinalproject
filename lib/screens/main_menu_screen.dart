@@ -5,901 +5,375 @@ import 'ImageScanning.dart';
 import 'inventory_screen.dart';
 import 'ai_recipe_screen.dart';
 
-
 class MainMenuScreen extends StatefulWidget {
-
   const MainMenuScreen({super.key});
 
-
   @override
-  State<MainMenuScreen> createState() =>
-      _MainMenuScreenState();
-
+  State<MainMenuScreen> createState() => _MainMenuScreenState();
 }
-
-
 
 class _MainMenuScreenState extends State<MainMenuScreen> {
-
-
   // ดึงชื่อ User จาก Supabase
-  final supabase =
-    Supabase.instance.client;
+  final supabase = Supabase.instance.client;
 
+  String userName = "User";
 
-String userName = "User";
+  @override
+  void initState() {
+    super.initState();
 
-
-
-@override
-void initState(){
-
-  super.initState();
-
-  loadUser();
-
-}
-
-
-
-@override
-void didChangeDependencies(){
-
-  super.didChangeDependencies();
-
-  loadUser();
-
-}
-
-
-Future<void> loadUser() async {
-
-
-  final session =
-  supabase.auth.currentSession;
-
-
-
-  // ถ้า logout แล้ว ไม่มี session ให้หยุดเลย
-  if(session == null){
-
-    return;
-
+    loadUser();
   }
 
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
 
+    loadUser();
+  }
 
+  Future<void> loadUser() async {
+    final session = supabase.auth.currentSession;
 
-  final response =
-  await supabase.auth.getUser();
-
-
-
-  final user =
-  response.user;
-
-
-
-  if(user != null){
-
-
-    final firstName =
-    user.userMetadata?['first_name'] ?? "";
-
-
-
-    final lastName =
-    user.userMetadata?['last_name'] ?? "";
-
-
-
-
-    if(mounted){
-
-
-      setState((){
-
-
-        userName =
-        "$firstName $lastName";
-
-
-      });
-
-
+    // ถ้า logout แล้ว ไม่มี session ให้หยุดเลย
+    if (session == null) {
+      return;
     }
 
+    final response = await supabase.auth.getUser();
 
+    final user = response.user;
+
+    if (user != null) {
+      final firstName = user.userMetadata?['first_name'] ?? "";
+
+      final lastName = user.userMetadata?['last_name'] ?? "";
+
+      if (mounted) {
+        setState(() {
+          userName = "$firstName $lastName";
+        });
+      }
+    }
   }
-
-}
-
-
 
   @override
   Widget build(BuildContext context) {
-
-
     return Scaffold(
-
-      backgroundColor:
-      const Color(0xffD8EEFF),
-
-
+      backgroundColor: const Color(0xffD8EEFF),
 
       body: SafeArea(
-
         child: LayoutBuilder(
+          builder: (context, size) {
+            final screenHeight = size.maxHeight;
 
-          builder: (context,size){
-
-
-            final screenHeight =
-                size.maxHeight;
-
-
-            final screenWidth =
-                size.maxWidth;
-
-
-
-           
-
-
+            final screenWidth = size.maxWidth;
 
             return Padding(
-
               padding: EdgeInsets.symmetric(
+                horizontal: screenWidth * 0.07,
 
-                horizontal:
-                screenWidth * 0.07,
-
-
-                vertical:
-                screenHeight * 0.03,
-
+                vertical: screenHeight * 0.03,
               ),
 
-
-
               child: Column(
-
-
                 children: [
-
-
-
                   // ================= HEADER =================
-
-
                   SizedBox(
-
-                    height:
-                    screenHeight * 0.12,
-
+                    height: screenHeight * 0.12,
 
                     child: Row(
-
                       children: [
-
-
                         CircleAvatar(
+                          radius: screenWidth * 0.07,
 
-                          radius:
-                          screenWidth * 0.07,
-
-
-                          backgroundColor:
-                          const Color(0xff5189C9),
-
+                          backgroundColor: const Color(0xff5189C9),
 
                           child: Icon(
-
                             Icons.person,
 
+                            size: screenWidth * 0.09,
 
-                            size:
-                            screenWidth * 0.09,
-
-
-                            color:
-                            Colors.white,
-
+                            color: Colors.white,
                           ),
-
                         ),
 
-
-
-                        SizedBox(
-
-                          width:
-                          screenWidth * 0.03,
-
-                        ),
-
-
+                        SizedBox(width: screenWidth * 0.03),
 
                         Expanded(
-
-
                           child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
 
-
-                            mainAxisAlignment:
-                            MainAxisAlignment.center,
-
-
-                            crossAxisAlignment:
-                            CrossAxisAlignment.start,
-
-
+                            crossAxisAlignment: CrossAxisAlignment.start,
 
                             children: [
-
-
-
                               Text(
-
                                 "SmartFridge",
 
-
                                 style: TextStyle(
+                                  fontSize: screenWidth * 0.065,
 
-                                  fontSize:
-                                  screenWidth * 0.065,
-
-
-                                  fontWeight:
-                                  FontWeight.bold,
-
+                                  fontWeight: FontWeight.bold,
                                 ),
-
                               ),
-
-
-
 
                               Text(
-
                                 "ตู้เย็นอัจฉริยะของคุณ $userName",
 
-
-                                style: TextStyle(
-
-                                  fontSize:
-                                  screenWidth * 0.035,
-
-                                ),
-
+                                style: TextStyle(fontSize: screenWidth * 0.035),
                               ),
-
-
-
                             ],
-
                           ),
-
                         ),
 
+                        IconButton(
+                          icon: Icon(Icons.settings, size: screenWidth * 0.08),
 
+                          onPressed: () async {
+                            await Navigator.push(
+                              context,
 
+                              MaterialPageRoute(
+                                builder: (_) => const ProfileScreen(),
+                              ),
+                            );
 
-                       IconButton(
+                            // โหลดชื่อใหม่หลังกลับจาก Profile
 
-  icon: Icon(
-
-    Icons.settings,
-
-    size: screenWidth * 0.08,
-
-  ),
-
-
-  onPressed: () async {
-
-
-    await Navigator.push(
-
-      context,
-
-      MaterialPageRoute(
-
-        builder: (_) =>
-        const ProfileScreen(),
-
-      ),
-
-    );
-
-
-    // โหลดชื่อใหม่หลังกลับจาก Profile
-
-    loadUser();
-
-
-  },
-
-),
-
-
+                            loadUser();
+                          },
+                        ),
                       ],
-
                     ),
-
                   ),
 
-
-
-
-
-                  SizedBox(
-
-                    height:
-                    screenHeight * 0.025,
-
-                  ),
-
-
-
+                  SizedBox(height: screenHeight * 0.025),
 
                   // ================= SUMMARY =================
-
-
-
                   Container(
-
-                    height:
-                    screenHeight * 0.09,
-
+                    height: screenHeight * 0.09,
 
                     decoration: BoxDecoration(
+                      color: Colors.white,
 
-                      color:
-                      Colors.white,
-
-
-                      borderRadius:
-                      BorderRadius.circular(25),
-
+                      borderRadius: BorderRadius.circular(25),
                     ),
-
-
 
                     child: Row(
-
-
                       children: [
-
-
-                        stat(
-                            "24",
-                            "รายการ",
-                            Colors.green
-                        ),
-
+                        stat("24", "รายการ", Colors.green),
 
                         divider(),
 
-
-                        stat(
-                            "3",
-                            "ใกล้หมดอายุ",
-                            Colors.orange
-                        ),
-
+                        stat("3", "ใกล้หมดอายุ", Colors.orange),
 
                         divider(),
 
-
-                        stat(
-                            "1",
-                            "หมดแล้ว",
-                            Colors.red
-                        ),
-
-
-
+                        stat("1", "หมดแล้ว", Colors.red),
                       ],
-
                     ),
-
                   ),
 
-
-
-
-
-                  SizedBox(
-
-                    height:
-                    screenHeight * 0.06,
-
-                  ),
-
-
-
-
+                  SizedBox(height: screenHeight * 0.06),
 
                   // ================= MENU =================
-
-
-
                   Expanded(
-
                     child: GridView.builder(
-
-
-                      physics:
-                      const NeverScrollableScrollPhysics(),
-
+                      physics: const NeverScrollableScrollPhysics(),
 
                       itemCount: 6,
 
-
-
-                      gridDelegate:
-                      SliverGridDelegateWithFixedCrossAxisCount(
-
-
+                      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
                         crossAxisCount: 2,
 
+                        crossAxisSpacing: screenWidth * 0.04,
 
-                        crossAxisSpacing:
-                        screenWidth * 0.04,
+                        mainAxisSpacing: screenHeight * 0.025,
 
-
-                        mainAxisSpacing:
-                        screenHeight * 0.025,
-
-
-                        childAspectRatio:
-                        1.15,
-
-
+                        childAspectRatio: 1.15,
                       ),
 
-
-
-                      itemBuilder:
-                          (context,index){
-
-
+                      itemBuilder: (context, index) {
                         final menus = [
-
-
                           [
                             Icons.camera_alt,
                             "ถ่ายภาพวัตถุดิบ",
-                            "เพิ่มของในตู้เย็น"
+                            "เพิ่มของในตู้เย็น",
                           ],
-
 
                           [
                             Icons.calendar_month,
                             "แพลนอาหาร",
-                            "สร้างเมนูรายสัปดาห์"
+                            "สร้างเมนูรายสัปดาห์",
                           ],
-
 
                           [
                             Icons.notifications,
                             "วันหมดอายุ",
-                            "แจ้งเตือนหมดอายุ"
+                            "แจ้งเตือนหมดอายุ",
                           ],
-
 
                           [
                             Icons.kitchen,
                             "เช็คตู้เย็น",
-                            "ดูวัตถุดิบได้จากทุกที่"
+                            "ดูวัตถุดิบได้จากทุกที่",
                           ],
-
 
                           [
                             Icons.document_scanner,
                             "สแกนสูตรอาหาร",
-                            "บันทึกสูตรเข้าคลัง"
+                            "บันทึกสูตรเข้าคลัง",
                           ],
-
 
                           [
                             Icons.restaurant,
                             "สร้างเมนูอาหาร",
-                            "จากของที่มีอยู่"
+                            "จากของที่มีอยู่",
                           ],
-
-
                         ];
 
-
-
                         return menuCard(
+                          menus[index][0] as IconData,
 
-                          menus[index][0]
-                              as IconData,
+                          menus[index][1] as String,
 
+                          menus[index][2] as String,
 
-                          menus[index][1]
-                              as String,
-
-
-                          menus[index][2]
-                              as String,
-
-
-                              (){
-
-
-                            if(index == 0){
-
+                          () {
+                            if (index == 0) {
                               Navigator.push(
-
                                 context,
 
                                 MaterialPageRoute(
-
-                                  builder: (_) =>
-                                  const ImageScanning(),
-
+                                  builder: (_) => const ImageScanning(),
                                 ),
-
                               );
-
                             }
 
-
-
-                            if(index == 3){
-
+                            if (index == 3) {
                               Navigator.push(
-
                                 context,
 
                                 MaterialPageRoute(
-
-                                  builder: (_) =>
-                                  const InventoryScreen(),
-
+                                  builder: (_) => const InventoryScreen(),
                                 ),
-
                               );
-
                             }
 
-
-
-
-                            if(index == 5){
-
+                            if (index == 5) {
                               Navigator.push(
-
                                 context,
 
                                 MaterialPageRoute(
-
-                                  builder: (_) =>
-                                  const AiRecipeScreen(),
-
+                                  builder: (_) => const AiRecipeScreen(),
                                 ),
-
                               );
-
                             }
-
-
                           },
-
                         );
-
-
                       },
-
                     ),
-
-                  )
-
-
+                  ),
                 ],
-
               ),
-
             );
-
-
           },
-
         ),
-
       ),
-
     );
-
   }
 
-
-
-
-
-
-  Widget stat(
-      String number,
-      String title,
-      Color color,
-      ){
-
+  Widget stat(String number, String title, Color color) {
     return Expanded(
-
       child: Column(
-
-        mainAxisAlignment:
-        MainAxisAlignment.center,
-
+        mainAxisAlignment: MainAxisAlignment.center,
 
         children: [
-
-
           Text(
-
             number,
 
-
             style: TextStyle(
+              color: color,
 
-              color:
-              color,
+              fontWeight: FontWeight.bold,
 
-
-              fontWeight:
-              FontWeight.bold,
-
-
-              fontSize:
-              28,
-
-
+              fontSize: 28,
             ),
-
           ),
 
+          const SizedBox(height: 3),
 
-
-          const SizedBox(height:3),
-
-
-
-          Text(
-
-            title,
-
-
-            style:
-            const TextStyle(
-
-              color:
-              Colors.blue,
-
-
-              fontSize:
-              13,
-
-            ),
-
-          ),
-
-
+          Text(title, style: const TextStyle(color: Colors.blue, fontSize: 13)),
         ],
-
       ),
-
     );
-
   }
 
-
-
-
-  Widget divider(){
-
-    return Container(
-
-      height:
-      45,
-
-
-      width:
-      1,
-
-
-      color:
-      Colors.amber,
-
-    );
-
+  Widget divider() {
+    return Container(height: 45, width: 1, color: Colors.amber);
   }
-
-
-
-
-
 
   Widget menuCard(
+    IconData icon,
 
-      IconData icon,
+    String title,
 
-      String title,
+    String subtitle,
 
-      String subtitle,
-
-      VoidCallback tap,
-
-      ){
-
-
+    VoidCallback tap,
+  ) {
     return InkWell(
+      onTap: tap,
 
-
-      onTap:tap,
-
-
-      borderRadius:
-      BorderRadius.circular(20),
-
-
+      borderRadius: BorderRadius.circular(20),
 
       child: Container(
-
-
         decoration: BoxDecoration(
+          color: Colors.white,
 
+          borderRadius: BorderRadius.circular(20),
 
-          color:
-          Colors.white,
-
-
-          borderRadius:
-          BorderRadius.circular(20),
-
-
-
-          border: Border.all(
-
-            color:
-            const Color(0xff4F8FE8),
-
-          ),
-
+          border: Border.all(color: const Color(0xff4F8FE8)),
         ),
-
-
 
         child: Column(
-
-
-          mainAxisAlignment:
-          MainAxisAlignment.center,
-
-
+          mainAxisAlignment: MainAxisAlignment.center,
 
           children: [
-
-
-
             Container(
+              width: 55,
 
-              width:
-              55,
+              height: 55,
 
+              decoration: const BoxDecoration(
+                color: Color(0xfffff38a),
 
-              height:
-              55,
-
-
-
-              decoration:
-              const BoxDecoration(
-
-
-                color:
-                Color(0xfffff38a),
-
-
-                shape:
-                BoxShape.circle,
-
-
+                shape: BoxShape.circle,
               ),
 
-
-
-              child: Icon(
-
-                icon,
-
-
-                color:
-                const Color(0xff5189C9),
-
-
-                size:
-                32,
-
-
-              ),
-
-
+              child: Icon(icon, color: const Color(0xff5189C9), size: 32),
             ),
 
-
-
-
-            const SizedBox(height:10),
-
-
-
+            const SizedBox(height: 10),
 
             Text(
-
               title,
 
+              textAlign: TextAlign.center,
 
-              textAlign:
-              TextAlign.center,
-
-
-
-              style:
-              const TextStyle(
-
-
-                fontSize:
-                15,
-
-
-                fontWeight:
-                FontWeight.bold,
-
-
-              ),
-
+              style: const TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
             ),
-
-
-
 
             Text(
-
               subtitle,
 
+              textAlign: TextAlign.center,
 
-              textAlign:
-              TextAlign.center,
-
-
-
-              style:
-              const TextStyle(
-
-
-                fontSize:
-                11,
-
-
-              ),
-
-
+              style: const TextStyle(fontSize: 11),
             ),
-
-
-
           ],
-
-
         ),
       ),
-
     );
-
   }
-
 }

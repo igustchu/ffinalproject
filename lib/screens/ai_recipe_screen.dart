@@ -627,4 +627,3 @@ class _AiRecipeScreenState extends State<AiRecipeScreen> {
     );
   }
 }
-

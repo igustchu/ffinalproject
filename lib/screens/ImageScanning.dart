@@ -306,4 +306,3 @@ class _HomeScreenState extends State<ImageScanning> {
     );
   }
 }
-
